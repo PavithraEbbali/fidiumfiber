@@ -5,6 +5,46 @@ Each entry lists what changed, why, and how to undo it.
 
 ---
 
+## [0009] 2026-09-16 — Hero headline made legible
+
+The gradient second line was close to invisible against the photograph. Measured
+against the wall behind it (luminance 0.517):
+
+| Gradient stop | Contrast | |
+|---|---|---|
+| `#008533` brand deep green | 2.58:1 | fails |
+| `#00AE42` brand green | 1.59:1 | fails |
+| `#93D500` brand lime | **1.04:1** | effectively invisible |
+
+The lime end sat at almost exactly the luminance of the wall, which is why the
+final word disappeared.
+
+### Fix
+
+`.grad-word` now uses a dedicated dark ramp, declared as tokens on `:root`:
+
+```
+--headline-green-dark: #002b0d;   /* 8.4:1 */
+--headline-green-mid:  #003d17;   /* 6.8:1 */
+--headline-green:      #00551f;   /* 4.9:1 */
+```
+
+Even the lightest stop clears WCAG AA for **normal** text, and the headline is
+set far larger than that. `.grad-word` is used only by the hero headline, so the
+vibrant brand ramp is untouched everywhere else — `.grad-text` still drives the
+logo, which sits on white where lime reads fine.
+
+A white text-shadow was tried first to lift the glyphs off the photograph, then
+removed: it softened the edges and made the line read lighter than it is. The
+dark ramp carries the contrast on its own.
+
+### To revert this entry
+
+Point `.grad-word` back at `--brand-green-deep` / `--brand-green` / `--brand-lime`
+in `app/globals.css` and delete the three `--headline-green-*` tokens.
+
+---
+
 ## [0008] 2026-09-16 — Hero call button and OR divider removed
 
 Removed from the hero, on request:

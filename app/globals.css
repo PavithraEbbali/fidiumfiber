@@ -13,6 +13,11 @@
   --brand-navy: #003595;
   --brand-promo: #f97e19;
   --ink: #0b1220;
+
+  /* Headline-on-photograph ramp — see .grad-word for the contrast measurements. */
+  --headline-green-dark: #002b0d;
+  --headline-green-mid: #003d17;
+  --headline-green: #00551f;
   --header-h: 68px;
 }
 
@@ -235,13 +240,22 @@ html.lenis body {
 /*
  * Gradient words. The ramp is stretched to the full line width and shifted per
  * word by the measured offset, so a staggered line still reads as one gradient.
+ *
+ * This ramp is deliberately dark. These words sit directly on the hero
+ * photograph with no scrim, and measured against it the brand ramp was
+ * unreadable: #008533 gave 2.6:1, #00AE42 1.6:1 and #93D500 only 1.04:1 —
+ * the lime is almost exactly the luminance of the wall behind it.
+ *
+ * The stops below measure 8.4:1 falling to 4.9:1, so even the lightest end
+ * clears WCAG AA for normal text, with the headline set far larger than that.
+ * The vibrant ramp is still used by .grad-text for the logo, which sits on white.
  */
 .grad-word {
   background-image: linear-gradient(
     100deg,
-    var(--brand-green-deep) 0%,
-    var(--brand-green) 45%,
-    var(--brand-lime) 100%
+    var(--headline-green-dark) 0%,
+    var(--headline-green-mid) 55%,
+    var(--headline-green) 100%
   );
   background-size: var(--bg-w, 100%) 100%;
   background-position-x: var(--bg-x, 0px);
