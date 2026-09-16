@@ -5,6 +5,76 @@ Each entry lists what changed, why, and how to undo it.
 
 ---
 
+## [0007] 2026-09-16 — Mobile responsiveness, Vercel prep, first push
+
+### Responsive: the two background photographs needed a per-breakpoint strategy
+
+Layout already stacked correctly, but the full-bleed photographs did not survive
+a phone aspect ratio:
+
+| | Before | After |
+|---|---|---|
+| Hero photo visible width @375px | **21%** (blank wall) | **~19% repositioned** onto the table, mug and person |
+| Features photo visible width @320px | **12%** (abstract texture) | shown as a **band** at its own aspect ratio |
+
+- **Hero** — `object-[68%_46%] sm:object-[60%_50%] lg:object-center`. A phone
+  hero frame is roughly 0.34:1, so `object-cover` can only ever show a narrow
+  vertical slice; centred, that slice was empty wall. Shifting right puts the
+  table and the person in it. Mobile vertical rhythm also tightened
+  (`py-10`, smaller `mt-*`) so the hero is less absurdly taller than the screen.
+- **Features** — the full-bleed background is now `hidden lg:block`. Below `lg`
+  the same photograph renders as a `16/11 → 16/9` band inside the section, so it
+  stays a picture of a family rather than a 12% sliver.
+
+### Responsive: animations
+
+- `useParallax` now bails out on `(pointer: coarse)`. A scroll-linked transform
+  costs battery every frame and the travel is imperceptible on a phone.
+  Tilt, magnetic hover and Lenis were already disabled on touch.
+
+### Verified at every breakpoint
+
+| Width | Plans | Features | Steps | Specs table | Features photo |
+|---|---|---|---|---|---|
+| 320 | 1 col | 1 col | 1 col | stacked cards | band |
+| 375 | 1 col | 1 col | 1 col | stacked cards | band |
+| 768 | 2 col | 2 col | 2 col | stacked cards | band |
+| 1440 | 3 col | 3 col | 4 col | full table | full background |
+
+Zero horizontal overflow at every width. `next/image` served 640w/750w variants
+at 320px and 1920w on desktop.
+
+### Vercel readiness
+
+| Change | Why |
+|---|---|
+| `siteUrl()` in `lib/content.ts` | Absolute URLs now resolve `NEXT_PUBLIC_SITE_URL` → `VERCEL_URL` → `SITE.domain`. Without it every preview deployment would claim production's canonical and point social cards at a domain that is not live. Wired into `metadataBase`, the JSON-LD graph, `sitemap.ts` and `robots.ts`. |
+| Security headers in `next.config.mjs` | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS. |
+| `images.formats` + `minimumCacheTTL` | AVIF/WebP with a one-year cache on optimised variants; `immutable` on `/images/*`. |
+| `engines.node >= 18.18.0` | Pins the Vercel build runtime. |
+| `.env.example` | Documents the single variable to set. |
+| README deployment section | Import steps and what is already configured. |
+
+No `vercel.json` — Vercel auto-detects Next.js, and adding one would only risk
+overriding good defaults.
+
+### Pushed to GitHub
+
+`https://github.com/PavithraEbbali/fidiumfiber` · branch `main` · commit `c05495a`
+· **55 files, 1.31 MB**.
+
+Excluded and verified as untracked: `node_modules`, `.next`, `image-source/`
+(the ~41 MB of original PNGs). Secret scan clean.
+
+### To revert this entry
+
+`git reset --hard` to before `c05495a` locally. For the responsive work
+specifically: remove the `object-[…]` variants from `Hero.tsx`, drop the
+`hidden lg:block` wrapper and the mobile band from `Features.tsx`, and remove
+the `pointer: coarse` guard from `useParallax`.
+
+---
+
 ## [0006] 2026-09-16 — Re-audit, entity rename, hero photo unmasked
 
 ### Re-audit of fidiumfiber.com — one service line was missed
