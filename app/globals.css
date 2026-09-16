@@ -1,0 +1,497 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================================================== */
+/*  BASE                                                                      */
+/* ========================================================================== */
+
+:root {
+  --brand-lime: #93d500;
+  --brand-green: #00ae42;
+  --brand-green-deep: #008533;
+  --brand-navy: #003595;
+  --brand-promo: #f97e19;
+  --ink: #0b1220;
+  --header-h: 68px;
+}
+
+* {
+  border-color: rgb(226 232 240);
+}
+
+html {
+  /* Lenis drives the smooth scroll; native smooth would fight it. */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: #ffffff;
+  color: var(--ink);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Zero horizontal overflow, down to 320px. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--brand-lime);
+  color: #06210b;
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand-green);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Anchor targets clear the sticky chrome. */
+[id] {
+  scroll-margin-top: calc(var(--header-h) + 48px);
+}
+
+/* ========================================================================== */
+/*  LENIS                                                                     */
+/* ========================================================================== */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ========================================================================== */
+/*  LAYOUT PRIMITIVES                                                         */
+/* ========================================================================== */
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-container px-5 sm:px-6 lg:px-8;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em];
+  }
+
+  .h-display {
+    @apply text-[clamp(2rem,6.2vw,3.9rem)] font-extrabold leading-[1.04] tracking-[-0.03em];
+  }
+
+  .h-section {
+    @apply text-[clamp(1.65rem,4.2vw,2.75rem)] font-extrabold leading-[1.1] tracking-[-0.025em];
+  }
+
+  .body-lg {
+    @apply text-[clamp(0.98rem,1.7vw,1.125rem)] leading-[1.7];
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-slate-200/90 bg-white shadow-card;
+  }
+
+  .grad-text {
+    background: linear-gradient(
+      100deg,
+      var(--brand-green-deep) 0%,
+      var(--brand-green) 45%,
+      var(--brand-lime) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .grad-brand {
+    background-image: linear-gradient(
+      100deg,
+      var(--brand-green) 0%,
+      var(--brand-lime) 100%
+    );
+  }
+
+  /* ---- Buttons ---------------------------------------------------------- */
+
+  .btn {
+    @apply relative inline-flex select-none items-center justify-center gap-2
+           rounded-full px-6 py-3.5 text-[0.95rem] font-bold leading-none
+           transition-all duration-300 ease-brand will-change-transform;
+  }
+
+  .btn-primary {
+    @apply btn text-white;
+    background-image: linear-gradient(
+      100deg,
+      var(--brand-green) 0%,
+      var(--brand-lime) 110%
+    );
+    box-shadow: 0 10px 30px -10px rgba(0, 174, 66, 0.65);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 16px 40px -12px rgba(0, 174, 66, 0.8);
+    filter: brightness(1.04);
+  }
+
+  .btn-dark {
+    @apply btn bg-ink text-white;
+    box-shadow: 0 10px 30px -12px rgba(11, 18, 32, 0.6);
+  }
+
+  .btn-dark:hover {
+    @apply bg-navy;
+  }
+
+  .btn-ghost {
+    @apply btn border-2 border-slate-900/10 bg-white text-ink;
+  }
+
+  .btn-ghost:hover {
+    @apply border-fidium/45 text-fidium-600;
+    background: #f6fcf0;
+  }
+
+  .btn-onDark {
+    @apply btn border-2 border-white/25 bg-white/10 text-white backdrop-blur-sm;
+  }
+
+  .btn-onDark:hover {
+    @apply border-white/60 bg-white/15;
+  }
+
+  /* ---- Chips ------------------------------------------------------------ */
+
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-slate-200
+           bg-white px-3.5 py-2 text-[0.8rem] font-semibold text-slate-700;
+  }
+
+  .chip-dark {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/20
+           bg-white/10 px-3.5 py-2 text-[0.8rem] font-semibold text-white/90
+           backdrop-blur-sm;
+  }
+}
+
+/* ========================================================================== */
+/*  SCROLL REVEAL — IntersectionObserver driven, zero JS animation libs       */
+/* ========================================================================== */
+
+.anim [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-y, 24px), 0)
+    scale(var(--reveal-s, 1));
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-d, 0ms);
+  will-change: opacity, transform;
+}
+
+.anim [data-reveal='is-in'] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Word-by-word text reveal */
+.reveal-line {
+  display: block;
+  overflow: hidden;
+}
+
+.reveal-word {
+  display: inline-block;
+}
+
+.anim .reveal-word {
+  opacity: 0;
+  transform: translate3d(0, 110%, 0);
+  transition:
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--w-delay, 0ms);
+  will-change: transform, opacity;
+}
+
+.anim [data-reveal='is-in'] .reveal-word,
+.anim .is-in .reveal-word {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/*
+ * Gradient words. The ramp is stretched to the full line width and shifted per
+ * word by the measured offset, so a staggered line still reads as one gradient.
+ */
+.grad-word {
+  background-image: linear-gradient(
+    100deg,
+    var(--brand-green-deep) 0%,
+    var(--brand-green) 45%,
+    var(--brand-lime) 100%
+  );
+  background-size: var(--bg-w, 100%) 100%;
+  background-position-x: var(--bg-x, 0px);
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ========================================================================== */
+/*  SVG PATH DRAW                                                             */
+/* ========================================================================== */
+
+.anim .path-draw {
+  stroke-dasharray: var(--len, 1200);
+  stroke-dashoffset: var(--len, 1200);
+  transition: stroke-dashoffset 2.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--draw-d, 0ms);
+}
+
+.anim [data-reveal='is-in'] .path-draw,
+.anim .is-in .path-draw {
+  stroke-dashoffset: 0;
+}
+
+/* ========================================================================== */
+/*  CLIP-PATH SECTION WIPE                                                    */
+/* ========================================================================== */
+
+/* Diagonal wipe used between major dark/light sections */
+.anim .wipe-diagonal {
+  clip-path: polygon(
+    0 var(--wipe-l, 100%),
+    100% var(--wipe-r, 100%),
+    100% 100%,
+    0 100%
+  );
+  transition: clip-path 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: clip-path;
+}
+
+.anim .is-in .wipe-diagonal,
+.anim .is-in.wipe-diagonal {
+  --wipe-l: 0%;
+  --wipe-r: 34%;
+}
+
+/* ========================================================================== */
+/*  MARQUEE                                                                   */
+/* ========================================================================== */
+
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 38s) linear infinite;
+}
+
+.marquee-reverse .marquee-track {
+  animation-direction: reverse;
+}
+
+.marquee-mask:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ========================================================================== */
+/*  3D TILT CARD                                                              */
+/* ========================================================================== */
+
+.tilt-scene {
+  perspective: 1100px;
+}
+
+.tilt-body {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+    translate3d(0, var(--tz, 0px), 0);
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.tilt-body[data-active='1'] {
+  transition: transform 0.12s linear, box-shadow 0.45s ease;
+}
+
+.tilt-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(147, 213, 0, 0.16),
+    transparent 62%
+  );
+}
+
+.tilt-body[data-active='1'] .tilt-sheen {
+  opacity: 1;
+}
+
+.tilt-lift {
+  transform: translateZ(45px);
+}
+
+/* ========================================================================== */
+/*  ACCORDION                                                                 */
+/* ========================================================================== */
+
+.acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.acc-panel[data-open='1'] {
+  grid-template-rows: 1fr;
+}
+
+.acc-inner {
+  overflow: hidden;
+}
+
+/* ========================================================================== */
+/*  MISC                                                                      */
+/* ========================================================================== */
+
+.grid-lines {
+  background-image: linear-gradient(
+      to right,
+      rgba(148, 163, 184, 0.13) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.13) 1px, transparent 1px);
+  background-size: 68px 68px;
+}
+
+.noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========================================================================== */
+/*  REDUCED MOTION — everything degrades to instant + legible                 */
+/* ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal],
+  .reveal-word {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .wipe-diagonal {
+    clip-path: none !important;
+  }
+
+  .path-draw {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+  }
+}
+
+/* ========================================================================== */
+/*  LEGAL PROSE                                                               */
+/* ========================================================================== */
+
+.legal-prose h2 {
+  margin-top: 2.25rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.legal-prose h2:first-child {
+  margin-top: 0;
+}
+
+.legal-prose h3 {
+  margin-top: 1.5rem;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.legal-prose p,
+.legal-prose li {
+  margin-top: 0.85rem;
+  font-size: 0.92rem;
+  line-height: 1.78;
+  color: rgb(71 85 105);
+}
+
+.legal-prose ul {
+  margin-top: 0.5rem;
+  padding-left: 1.15rem;
+  list-style: disc;
+}
+
+.legal-prose li::marker {
+  color: var(--brand-green);
+}
+
+.legal-prose a {
+  color: var(--brand-green-deep);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" width="300" height="280" role="img" aria-label="Person waving during a smooth video call at their desk">
+  <!-- glow -->
+  <ellipse cx="150" cy="248" rx="120" ry="18" fill="#93d500" opacity="0.10"/>
+  <!-- waving arm (behind desk) -->
+  <path d="M62 176c-10-14-16-28-16-44" stroke="#e8b08c" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <circle cx="46" cy="124" r="9" fill="#e8b08c"/>
+  <!-- person -->
+  <g>
+    <rect x="60" y="146" width="78" height="70" rx="34" fill="#00ae42"/>
+    <path d="M60 200h78v16H60z" fill="#008533"/>
+    <circle cx="99" cy="120" r="25" fill="#e8b08c"/>
+    <path d="M74 116a25 25 0 0 1 44-12c3 4 5 8 6 12-8-9-17-13-28-13-9 0-16 4-22 13Z" fill="#2a2d2e"/>
+    <circle cx="99" cy="90" r="10" fill="#2a2d2e"/>
+  </g>
+  <!-- laptop -->
+  <g>
+    <rect x="150" y="118" width="100" height="74" rx="9" fill="#c7cdd2"/>
+    <rect x="156" y="124" width="88" height="62" rx="6" fill="#12271c"/>
+    <!-- call tiles -->
+    <g>
+      <rect x="161" y="129" width="39" height="26" rx="4" fill="#1e4a2e"/>
+      <rect x="204" y="129" width="35" height="26" rx="4" fill="#2e6b3f"/>
+      <rect x="161" y="159" width="35" height="22" rx="4" fill="#245c36"/>
+      <rect x="200" y="159" width="39" height="22" rx="4" fill="#1b3d27"/>
+      <circle cx="180" cy="140" r="5" fill="#dff5ac"/><path d="M171 155c1-6 5-9 9-9s8 3 9 9" fill="#dff5ac"/>
+      <circle cx="221" cy="140" r="5" fill="#e8b08c"/><path d="M212 155c1-6 5-9 9-9s8 3 9 9" fill="#e8b08c"/>
+      <circle cx="178" cy="168" r="4.4" fill="#b67a54"/><path d="M170 181c1-5 4-8 8-8s7 3 8 8" fill="#b67a54"/>
+      <circle cx="219" cy="168" r="4.4" fill="#93d500"/><path d="M211 181c1-5 4-8 8-8s7 3 8 8" fill="#93d500"/>
+    </g>
+    <rect x="142" y="192" width="116" height="9" rx="4.5" fill="#aeb4ba"/>
+  </g>
+  <!-- desk -->
+  <rect x="18" y="200" width="264" height="15" rx="7.5" fill="#2a3c31"/>
+  <!-- mug -->
+  <rect x="256" y="180" width="20" height="20" rx="5" fill="#93d500"/>
+  <path d="M276 185c6 0 6 10 0 10" stroke="#93d500" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M262 172c0-4 3-4 3-7M270 172c0-4 3-4 3-7" stroke="#dff5ac" stroke-width="2.4" stroke-linecap="round" fill="none" opacity="0.8"/>
+</svg>

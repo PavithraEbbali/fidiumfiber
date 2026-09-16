@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+.env*.local
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+
+# Original AI-generated source images (not served, not deployed)
+image-source/
+
+# Vercel
+.vercel

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 200" width="260" height="200" role="img" aria-label="Home filled with WiFi coverage">
+  <g stroke="#93d500" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6">
+    <path d="M62 108 130 56l68 52"/>
+    <path d="M78 100v58c0 5 4 9 9 9h86c5 0 9-4 9-9v-58"/>
+    <path d="M118 167v-30c0-4 3-7 7-7h10c4 0 7 3 7 7v30"/>
+  </g>
+  <rect x="94" y="116" width="22" height="18" rx="4" fill="#93d500" opacity="0.28"/>
+  <rect x="144" y="116" width="22" height="18" rx="4" fill="#93d500" opacity="0.28"/>
+  <!-- gateway + waves -->
+  <circle cx="130" cy="96" r="4.4" fill="#93d500"/>
+  <g stroke="#93d500" stroke-width="3.4" stroke-linecap="round" fill="none" opacity="0.85">
+    <path d="M112 42a26 26 0 0 1 36 0"/>
+    <path d="M120 30a38 38 0 0 1 20 0" opacity="0.5"/>
+  </g>
+  <!-- ground -->
+  <path d="M46 176h30M186 176h28" stroke="#2e4a3a" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" width="300" height="280" role="img" aria-label="Person relaxing on a beanbag playing an online game">
+  <!-- floor glow -->
+  <ellipse cx="152" cy="252" rx="118" ry="20" fill="#93d500" opacity="0.12"/>
+  <!-- beanbag -->
+  <path d="M92 246c-14-4-22-16-20-30 3-18 22-30 46-32l68-2c22 2 40 14 42 32 2 16-10 28-26 32-36 8-78 8-110 0Z" fill="#22372b"/>
+  <path d="M92 246c-14-4-22-16-20-30 2-12 11-21 24-26-4 20 6 38 28 48-12 2-23 5-32 8Z" fill="#1b2c22"/>
+  <!-- far arm (behind) -->
+  <path d="M176 152 132 170" stroke="#96613f" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <!-- legs -->
+  <path d="M170 196c-22-8-42-8-58-4" stroke="#25282e" stroke-width="17" stroke-linecap="round" fill="none"/>
+  <path d="M112 192c-4 14-4 26-2 38" stroke="#25282e" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <rect x="92" y="226" width="40" height="16" rx="8" fill="#dff5ac"/>
+  <!-- torso -->
+  <g transform="rotate(-10 178 168)">
+    <rect x="152" y="122" width="54" height="92" rx="27" fill="#93d500"/>
+    <rect x="152" y="176" width="54" height="38" rx="19" fill="#7ab500"/>
+  </g>
+  <!-- near arm to controller -->
+  <path d="M182 150 128 166" stroke="#b67a54" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <!-- controller -->
+  <g transform="rotate(-8 122 166)">
+    <rect x="102" y="156" width="40" height="20" rx="10" fill="#ebecf2"/>
+    <circle cx="112" cy="166" r="3.2" fill="#00ae42"/>
+    <circle cx="132" cy="166" r="3.2" fill="#93d500"/>
+  </g>
+  <!-- head -->
+  <circle cx="192" cy="102" r="23" fill="#b67a54"/>
+  <path d="M170 98a23 23 0 0 1 40-14c3 4 5 9 5 14-6-8-14-12-24-12-8 0-15 4-21 12Z" fill="#191a1c"/>
+  <!-- headset -->
+  <path d="M172 92a25 25 0 0 1 40-6" stroke="#dff5ac" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <circle cx="209" cy="98" r="8" fill="#dff5ac"/>
+  <path d="M209 106c0 8-6 12-14 13" stroke="#dff5ac" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+  <circle cx="193" cy="120" r="3" fill="#93d500"/>
+  <!-- sparks -->
+  <g stroke="#93d500" stroke-width="3" stroke-linecap="round" opacity="0.65">
+    <path d="M52 84v14M45 91h14"/>
+    <path d="M84 46v10M79 51h10"/>
+    <path d="M246 132v10M241 137h10"/>
+  </g>
+</svg>

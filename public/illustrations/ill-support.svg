@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 240" width="280" height="240" role="img" aria-label="Support agent with a headset waving hello">
+  <!-- glow ring -->
+  <circle cx="140" cy="128" r="82" fill="none" stroke="#93d500" stroke-width="10" opacity="0.16"/>
+  <ellipse cx="140" cy="216" rx="92" ry="13" fill="#93d500" opacity="0.12"/>
+  <!-- waving arm -->
+  <path d="M96 172c-14-12-24-28-26-46" stroke="#e8b08c" stroke-width="13" stroke-linecap="round" fill="none"/>
+  <circle cx="70" cy="118" r="9.5" fill="#e8b08c"/>
+  <!-- torso -->
+  <rect x="94" y="146" width="92" height="72" rx="34" fill="#dff5ac"/>
+  <path d="M128 146h24l-12 18Z" fill="#0e1a14"/>
+  <!-- head -->
+  <circle cx="140" cy="104" r="29" fill="#e8b08c"/>
+  <path d="M112 98a29 29 0 0 1 52-16c3 5 4 10 5 16-9-10-19-14-31-14-10 0-19 4-26 14Z" fill="#2a2d2e"/>
+  <!-- headset -->
+  <path d="M112 92a30 30 0 0 1 56-2" stroke="#25282e" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="104" y="94" width="12" height="20" rx="6" fill="#25282e"/>
+  <rect x="164" y="94" width="12" height="20" rx="6" fill="#25282e"/>
+  <path d="M168 114c0 12-10 18-22 19" stroke="#25282e" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="144" cy="134" r="4.4" fill="#93d500"/>
+  <!-- chat bubble -->
+  <g>
+    <rect x="178" y="44" width="66" height="38" rx="17" fill="#93d500"/>
+    <path d="m192 80-6 14 18-10Z" fill="#93d500"/>
+    <circle cx="198" cy="63" r="4" fill="#0e1a14"/>
+    <circle cx="211" cy="63" r="4" fill="#0e1a14"/>
+    <circle cx="224" cy="63" r="4" fill="#0e1a14"/>
+  </g>
+</svg>

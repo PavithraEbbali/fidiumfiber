@@ -1,0 +1,614 @@
+# ai.wing — Change Log & Revert Guide
+
+Running record of every AI-made change to this project. Newest entry at the top.
+Each entry lists what changed, why, and how to undo it.
+
+---
+
+## [0006] 2026-09-16 — Re-audit, entity rename, hero photo unmasked
+
+### Re-audit of fidiumfiber.com — one service line was missed
+
+| Line | Offered? | Evidence |
+|---|---|---|
+| Fiber internet | **Yes** | 5 speed tiers |
+| **Home phone** | **Yes** | Nav item at `/home-phone`. 20+ calling features. **No published price.** |
+| Cable | No | Only appears as a comparison ("40x faster than cable upload speeds") |
+| TV | No | Zero product usage; all matches were CSS class names |
+| Mobile | No | Zero product usage; all matches were CSS class names |
+| Bundles | No | Zero matches anywhere |
+
+**Home phone has been added** as a `serviceLine: 'phone'` plan. Fidium publishes
+no rate for it, so the plan carries no `price` — the lockup and its CTA switch
+themselves to **"Call for pricing"**, exactly as the architecture intended. It
+renders last, per the canonical service-line order.
+
+`FinePrint` now reads `plansFor('fiber')` rather than all `PLANS`, so the specs
+table stays a fiber speed comparison and does not gain a phone column.
+`PlanCard` falls back to the plan name when a plan has no speed.
+
+### Hero photograph unmasked
+
+The white scrim is gone entirely — the photograph renders at full strength.
+Legibility is handled on the **text** side instead, so nothing covers the image:
+
+| Element | Change | Measured against this photo |
+|---|---|---|
+| Headline | unchanged (ink) | **10.1:1** — passes AA |
+| Sub-copy | slate-600 → slate-700, medium weight | 4.8:1 → **6.5:1** |
+| Eyebrow | translucent pill → **solid white** pill | 2.1:1 (failed) → **4.8:1** |
+| "or" divider | slate-400 → slate-600 on a white pill | was failing |
+| ZIP helper | slate-500 → slate-700 semibold | was marginal |
+
+Contrast was measured per text band against the actual cropped region of
+`hero-home.jpg`, not estimated.
+
+### Why-fiber section is now the photograph
+
+`family-connected.jpg` is the full section background rather than an inset band.
+The section flips to dark: white heading, translucent `bg-ink/55` glass cards,
+lime icon chips. A **dark** scrim (`bg-ink/72` plus a vertical gradient) sits
+over it — that photo is a dim evening room, so light text needs it. The section
+wipe in `app/page.tsx` changed from `from="slate"` to `from="ink"` to match.
+
+### Navbar button
+
+The wide green glow (`0 10px 30px -10px rgba(0,174,66,.65)`) is replaced with a
+tight two-stop shadow, and the **magnetic hover was removed** — a button that
+drifts under the cursor reads as unstable in fixed chrome. Padding tightened to
+`px-5 py-2.5`. Applies to the compact mobile icon button too.
+
+### Copy
+
+- "Choose the plan that fits your household" → **"Compare speeds and pricing"**
+- "Engineered for consistent performance" → **"The advantages of a fiber-optic connection"**
+
+### Entity rename and copyright
+
+- `SITE.entity` and `SITE.shortName`: `Fiberline Communications LLC` → **`FidiumFiber`**.
+  Propagates to all 11 legal pages, the footer, and the structured data.
+- The footer copyright line and its `FOOTER.copyright` getter are removed.
+
+Verified: **0** occurrences of "Fiberline" and **0** copyright lines across all
+built routes; 95 `tel:` links, all carrying `data-call-cta`.
+
+> ⚠️ **Open compliance issue.** Naming the operating entity "FidiumFiber" makes
+> the legal pages self-contradictory — they now read *"FidiumFiber is an
+> independent authorized retailer of Fidium Fiber… It is not operated by Fidium
+> or its parent company."* Using the carrier's mark as your own business name
+> also cuts against the trademark notice on `/trademarks` and against Google
+> Ads' affiliate/misrepresentation rules. The display branding can stay as it
+> is; what needs to change is `SITE.entity`, which should be the real registered
+> company that signs the legal pages. One edit in `lib/content.ts` fixes it.
+
+### To revert this entry
+
+In `lib/content.ts`: restore `entity`/`shortName`, the `copyright` getter, the
+two headings, and delete the `phone-home` plan. In `Hero.tsx`: restore the
+`from-white/88 via-white/45 to-white/92` scrim and the original text colours.
+In `Features.tsx`: restore the light section with the inset lifestyle band. In
+`Header.tsx`: restore `magnetic` and the default shadow. In `FinePrint.tsx`:
+import `PLANS` again instead of `plansFor('fiber')`.
+
+---
+
+## [0005] 2026-09-16 — Photography implemented
+
+All five supplied images are live.
+
+### Bug fixed: the hero background layer was never visible
+
+The hero's background stack sat at `-z-10` inside
+`<section class="relative overflow-hidden bg-white">`. Because that section is
+`position: relative` with `z-index: auto`, it does **not** create a stacking
+context — so a negative-z-index descendant is painted in the root stacking
+context, behind the section's own opaque white background.
+
+The layer had therefore been invisible since the very first build. It went
+unnoticed while it only held faint grid lines; adding a photograph made it
+obvious. Fixed by ordering the layers explicitly instead of negatively:
+
+- background stack → `absolute inset-0 z-0`
+- `.container-x` content → `relative z-10`
+- trust ticker → `relative z-10`
+
+### Source files: PNG → JPEG
+
+The five files arrived as PNG at 2816 × 1536, 6.3–9.3 MB each (**41 MB total**).
+PNG is the wrong container for photographs. Converted to mozjpeg q82 4:4:4 and
+resized per slot: **41 MB → 0.99 MB**, no visible quality loss.
+
+### Gemini watermark removed
+
+Every file carried Gemini's four-pointed star watermark, baked in at roughly
+92% across and 85% down. Shipping it would have advertised AI generation on a
+site whose whole brief was photography that does not look AI-generated.
+
+Removed by cropping the right edge, sized per image so the subject survives and,
+where possible, a background flaw goes with it:
+
+| File | Right crop | Output | Also removed |
+|---|---|---|---|
+| `hero-home.jpg` | 11% | 2400 × 1471 | — |
+| `family-connected.jpg` | 11% | 1800 × 1103 | — |
+| `wifi-gateway.jpg` | 25% | 1600 × 1164 | the garbled AI newspaper text |
+| `technician-install.jpg` | 20% | 1600 × 1091 | the motorbike in the background |
+| `og-cover.jpg` | 11%, then trimmed from the top to 1.91:1 | 1200 × 628 | — |
+
+Verified by re-extracting the bottom-right corner of every processed file: all
+clean.
+
+### Originals preserved
+
+The untouched PNGs are in `image-source/` at the project root — outside
+`public/`, so they are neither served nor deployed. Added to `.gitignore`.
+Safe to delete once you are happy with the crops.
+
+### Other adjustments
+
+- `lib/images.ts` dimensions synced to the real output sizes.
+- Hero scrim relaxed to `from-white/88 via-white/45 to-white/92`. The supplied
+  hero photograph is a very bright room, so the previous 92/72 scrim erased it.
+- The decorative lime and green blur blobs now render **only when there is no
+  hero photograph**. Over a photo they muddied it.
+- `Features` lifestyle frame relaxed from `16/7` to `16/11 → 16/10 → 16/9` to
+  match the 1.63:1 source and keep the crop gentle.
+
+### Verification
+
+- Typecheck and build clean, 18 static pages.
+- All four on-page images load; `next/image` serves resized variants
+  (2400 px hero source delivered at 1024 px).
+- Hero carries `priority` and a `<link rel=preload>`; the other three lazy-load.
+- `og:image` present in metadata.
+- 23 `tel:` links, all with `data-call-cta`. CTA labels still only
+  "Call to order" plus the header/footer number.
+- No banned phrases; no horizontal overflow.
+
+### Known issues with the supplied artwork (not code)
+
+Three images do not match the US service area (CA, IL, ME, MN, NH, PA, TX, VT):
+
+- `family-connected.jpg` — interior reads as South Asian rather than US suburban.
+- `technician-install.jpg` — palm trees, a motorbike and the surrounding houses
+  read as South/Southeast Asian. The 20% crop removed the motorbike; the palms
+  and buildings remain.
+- `og-cover.jpg` — brick compound walls and marigolds read as non-US, and a
+  **camera tripod is visible in the garden** — the model took "tripod" from the
+  camera settings in the prompt and put a literal tripod in the scene.
+
+`hero-home.jpg` and `wifi-gateway.jpg` are both strong and need no rework.
+
+### To revert this entry
+
+Restore the PNGs from `image-source/` into `public/images/`, revert the hero
+`z-0`/`z-10` ordering to `-z-10`, restore the `from-white/92 via-white/72`
+scrim, move the blur blobs back outside the `hasHeroImage` branch, and reset the
+dimensions in `lib/images.ts`.
+
+---
+
+## [0004] 2026-09-16 — Photography slots wired (files not yet supplied)
+
+Five image slots added. **Drop the files into `public/images/` using the exact
+filenames below — nothing else needs editing.**
+
+| Slot | Filename | Size | Where it appears |
+|---|---|---|---|
+| `hero` | `hero-home.jpg` | 2400 × 1350 | Full-bleed behind the hero, under a white scrim |
+| `lifestyle` | `family-connected.jpg` | 1800 × 1000 | Wide band in the "Why fiber" section |
+| `gateway` | `wifi-gateway.jpg` | 1600 × 1200 | Equipment band above the specifications table |
+| `install` | `technician-install.jpg` | 1600 × 1200 | Beside the closing block in "How it works" |
+| `og` | `og-cover.jpg` | 1200 × 630 | Social share card (metadata only, never on-page) |
+
+### New files
+
+| File | Purpose |
+|---|---|
+| `lib/images.ts` | The manifest: filename, alt text and dimensions per slot. Client-safe (no `fs`). |
+| `lib/images.server.ts` | `hasImage()` / `imageFlags()` — build-time filesystem checks. Marked `server-only` so it can never be pulled into a client bundle. |
+
+### Graceful absence
+
+Every slot is guarded by `hasImage()`, evaluated **at build time**. A slot whose
+file is missing falls back to the previous treatment:
+
+- hero → the original grid-line background
+- lifestyle / gateway / install → the band is omitted entirely
+- og → the `og:image` meta tag is simply not emitted
+
+So the site never shows a broken image, an empty frame or a alt-text stub while
+the artwork is still being produced. Verified: with `public/images/` empty the
+build emits **0 `<img>` tags** and every section still renders.
+
+### Implementation notes
+
+- `next/image` throughout, so files are converted to AVIF/WebP and resized per
+  breakpoint automatically. A 2400 px hero source was served at 1024 px in
+  testing.
+- The hero uses `priority` (it is the LCP element) and gets a `<link rel=preload>`.
+  The other three are lazy-loaded — confirmed they do not fetch until scrolled to.
+- `sharp` installed, which `next/image` requires for production optimisation.
+- `server-only` installed to guard `lib/images.server.ts`.
+- Hero is a client component, so `app/page.tsx` resolves `hasImage('hero')` on
+  the server and passes it down as the `hasHeroImage` prop.
+
+### Hero scrim
+
+A single gradient — `from-white/92 via-white/72 to-white`. One layer, so the
+coverage is predictable: heavy at the top to keep the sticky header clean,
+lightest through the middle where the photograph should read, solid white at the
+bottom to blend into the next section.
+
+**To show more of the photograph, lower the `via-white/72` stop** in
+`components/sections/Hero.tsx`. To gain headline contrast, raise it.
+
+### To revert this entry
+
+Delete `lib/images.ts`, `lib/images.server.ts` and `public/images/`, remove the
+`Image` imports and `hasImage(...)` blocks from `Hero.tsx`, `Features.tsx`,
+`FinePrint.tsx`, `HowItWorks.tsx` and `layout.tsx`, and drop the `hasHeroImage`
+prop from `app/page.tsx`. `npm uninstall sharp server-only`.
+
+---
+
+## [0003] 2026-09-16 — Copy professionalised, animations trimmed, table bug fixed
+
+### Bug fixed: the fine-print section rendered blank on desktop
+
+The comparison table was wrapped in a `.wipe-in` clip-path reveal. The CSS that
+opened the clip was:
+
+```css
+.anim [data-reveal='is-in'].wipe-in,   /* same element */
+.anim .is-in .wipe-in { … }            /* needs a literal .is-in class */
+```
+
+but in the markup `.wipe-in` sat on a **child** of the `[data-reveal]` element,
+so neither selector ever matched. The clip stayed at
+`inset(0 0 100%)` — the table was clipped to zero height and the section looked
+empty between its heading and its footnote.
+
+**Fix:** removed the `.wipe-in` class from `FinePrint.tsx` and deleted the dead
+`.wipe-in` CSS block (plus its reduced-motion entry). The table still animates in
+via the existing `Reveal` fade-and-rise, and clip-path wipes between sections are
+unaffected — those come from `SectionWipe`'s separate `.wipe-diagonal`.
+
+### Copy rewritten for a more professional register
+
+All of it lives in `lib/content.ts`.
+
+| Where | Before | After |
+|---|---|---|
+| Hero H1 | "Fiber internet that keeps up with your whole house." | "Symmetrical fiber internet for the connected home." |
+| Plans heading | "Pick the speed your home actually needs" | "Choose the plan that fits your household" |
+| Why-fiber heading | "A connection built to be boring" | "Engineered for consistent performance" |
+| Why-fiber body | "Fiber runs light through glass instead of electrical signal through copper. In practice that means steadier speeds…" | "Fiber-optic lines carry data as light through glass rather than electrical signal through copper. The result is stable throughput during peak hours and upload speeds that match download speeds." |
+| Fine-print heading | "Everything in one table, nothing buried" | "Complete specifications, side by side" |
+| Fine-print eyebrow | "The honest fine print" | "Plan details" |
+| How-it-works heading | "Four steps from call to connected" | "From availability check to installation" |
+| How-it-works body | "No paperwork marathon and no guesswork about what is available on your street. Here is the whole process." | "Four steps, handled by a representative who confirms what is available at your service address before any order is placed." |
+
+The fine-print **eyebrow** was not on the request list, but leaving "THE HONEST
+FINE PRINT" above a newly formal heading left a tonal mismatch, so it moved too.
+
+### Removed
+
+| Item | Detail |
+|---|---|
+| Hero visual panel | The dark box with the canvas animation and the "Symmetrical by design / Download / Upload" readout. Hero is now a single centred column. |
+| `components/sections/FiberField.tsx` | **Deleted.** The canvas "black hole" field had no remaining consumer. |
+| Hero phone + hours | The plain-text `(888) 425-0568` and business hours beside the hero CTA. The **"Call to order" button stays** — only the text block went. |
+| How-it-works animation | The scroll-scrubbed gateway assembly SVG and its sticky column. Steps are now a static 4-column grid, and the section became a **server component** (no client JS at all). |
+| `useScrollProgress` | Removed from `lib/hooks.ts` — the assembly animation was its only caller. |
+| Footer "Ready when you are" band | The whole closing CTA block, including its "Compare plans" button. The footer now opens directly on the column grid. |
+
+### Also
+
+- `FEATURES_SECTION` and `HOW_IT_WORKS_SECTION` added to `lib/content.ts`. Those
+  two section headings had been hardcoded in JSX; they are now data like every
+  other string on the site.
+- Unused imports cleaned from `Hero.tsx` and `Footer.tsx`.
+
+### Verification
+
+- Typecheck and build clean; 18 static pages; homepage **99.6 kB** First Load JS
+  (down from 101 kB — the canvas and scroll-progress code are gone).
+- Fine-print table measured in the browser at **943 × 825 px, 9 rows × 6 columns** —
+  previously 0 × 0.
+- Hero contains no visible phone number or hours. The only `888` left in its
+  markup is inside the CTA's `tel:` href and aria-label, which the link needs.
+- Zero horizontal overflow at 320px.
+- All `tel:` links still carry `data-call-cta`; the only CTA label outside the
+  header and footer is still "Call to order".
+
+### To revert this entry
+
+Restore the copy strings in `lib/content.ts` from the table above, re-add the
+`.wipe-in` class and CSS, and restore `FiberField.tsx`, `useScrollProgress`, the
+hero visual column, the hero phone block, the how-it-works assembly animation and
+the footer CTA band.
+
+---
+
+## [0002] 2026-09-16 — Legal pages ported, old HTML project removed
+
+**Ask:** entire project in Next.js + TypeScript; all HTML removed.
+
+### Status of the HTML question
+
+This project never contained an HTML source file. The `.html` files referenced
+in earlier verification logs were `.next/` **build output** — the static pages
+Next.js prerenders on every `next build`. `.next/` has been deleted, and the
+empty unused `public/` folder with it (later recreated to hold the preserved
+illustrations below).
+
+The real HTML lived in a **separate, older project** at `Downloads/fidium/`,
+which held `legacy/index.html` plus 8 legal pages. That project has now been
+deleted entirely, after porting its legal content here.
+
+### New: centralized legal content
+
+| File | Purpose |
+|---|---|
+| **`lib/legal.ts`** | All 11 legal documents as structured data. Entity name, phone, address, domain and mailboxes are `{tokens}` resolved from `SITE` in `lib/content.ts`. |
+| `app/[slug]/page.tsx` | One dynamic route renders every legal page. `generateStaticParams` prerenders all 11; `dynamicParams = false` 404s anything else. |
+| `components/layout/LegalPage.tsx` | Rewritten: renders block data, builds an "On this page" TOC from the headings, and turns `[text](/route)` and bare emails into real links (no `dangerouslySetInnerHTML`). |
+
+**Deleted:** `app/privacy/`, `app/terms/`, `app/accessibility/`, `app/do-not-sell/`
+— all four are now data entries in `lib/legal.ts`.
+
+### Legal routes (11, all prerendered)
+
+`/privacy` · `/terms` · `/disclaimer` · `/service-fulfillment` · `/cookies` ·
+`/do-not-sell` · `/tcpa` · `/marketing-policy` · `/pci-dss` · `/trademarks` ·
+`/accessibility`
+
+Seven of these (disclaimer, service-fulfillment, cookies, TCPA, marketing
+policy, PCI DSS, trademarks) are newly ported and matter for Google Ads telecom
+compliance. The footer legal row and `sitemap.ts` are both generated from
+`LEGAL_DOCS`, so adding a document there wires up its page, metadata, sitemap
+entry and footer link with no new file.
+
+### Edits made while porting
+
+- Stripped every **"Last updated: July 7, 2026"** date stamp (negative constraint).
+- `[Reseller Legal Name]` → `{entity}` token.
+- **"reseller" → "retailer"** throughout, matching this site's language.
+- Old phone `1.844.434.3486` and `your-domain.com` mailboxes → `{phone}` and
+  `{email:*}` tokens resolved from `SITE`.
+- "network provider" → "Fidium" for clarity.
+- **Dropped unverified claims** carried over from the old copy: the "30-day
+  money-back trial", "reward cards" and "streaming bonus". None of these appear
+  on fidiumfiber.com, so stating them would be an unsupported factual claim.
+  Replaced with the verified month-to-month / no-ETF terms.
+
+### Also added
+
+- `SITE.email` in `lib/content.ts` — the mailbox names used by the legal pages.
+- `public/illustrations/` — 8 line illustrations plus `og-cover.svg` rescued
+  from the old project before deleting it (~17 KB total). **Currently unused**;
+  delete the folder if you do not want them.
+
+### Verification
+
+- Build clean: **18 static pages**, homepage still **101 kB** First Load JS.
+- 0 date stamps, 0 unresolved `{tokens}`, 0 "reseller" wording across all routes.
+- 107 `tel:` links across all pages, **all** carrying `data-call-cta`.
+- CTA labels still only "Call to order" plus the header/footer phone number.
+- Zero horizontal overflow at 320px on the legal pages.
+
+### To revert this entry
+
+Delete `lib/legal.ts`, `app/[slug]/`, `public/illustrations/`, restore the four
+original `app/<slug>/page.tsx` files and the `Legal` column in `FOOTER.columns`.
+The deleted `Downloads/fidium/` project cannot be restored.
+
+---
+
+## [0001] 2026-09-16 — Initial build (from scratch)
+
+**Scope:** Complete Fidium Authorized Retailer one-page landing site.
+**Stack:** Next.js 14.2.15 (App Router) · TypeScript (strict) · Tailwind CSS 3.4 · Lenis
+**Build result:** clean · 11 static routes · homepage First Load JS **101 kB**
+
+### Files created
+
+#### Configuration
+| File | Purpose |
+|---|---|
+| `package.json` | Deps: `next`, `react`, `react-dom`, `lenis`. Nothing else at runtime. |
+| `tsconfig.json` | Strict TS, `@/*` path alias. |
+| `next.config.mjs` | Strict mode, compression, console stripped in production. |
+| `tailwind.config.ts` | Official Fidium palette, full 0–100 opacity scale, brand easing/keyframes. |
+| `postcss.config.mjs` | Tailwind + Autoprefixer. |
+| `.claude/launch.json` | Dev/prod preview servers (ports 3112 / 3111). |
+
+#### Data layer — the single source of truth
+| File | Purpose |
+|---|---|
+| **`lib/content.ts`** | **Every price, speed, fee, promo, disclosure, FAQ and legal string.** Edit this file alone to update the whole site. |
+| `lib/hooks.ts` | Custom animation hooks: in-view, scroll progress, parallax, magnetic, tilt, scrolled, reduced-motion. |
+
+#### Components
+| File | Purpose |
+|---|---|
+| `components/primitives/PriceLockup.tsx` | **The one price renderer on the site.** `$` + dominant integer (2.5–3.5rem) + muted cents + `/mo`. Falls back to "Call for pricing" when a plan has no price. |
+| `components/primitives/CallButton.tsx` | Only component that emits a `tel:` sales link. Every instance carries `data-call-cta`. `CallNumberButton` is the header/footer variant that shows the number. |
+| `components/primitives/Reveal.tsx` | `Reveal` (entrance) and `RevealText` (word-by-word, optional brand gradient). |
+| `components/primitives/Marquee.tsx` | Infinite CSS ticker; screen readers get the list once. |
+| `components/primitives/SectionWipe.tsx` | Clip-path wipe between major sections + SVG fiber path draw. |
+| `components/providers/LenisProvider.tsx` | Lenis smooth scroll, dynamically imported after hydration. |
+| `components/layout/Logo.tsx` | Custom SVG Fidium-styled wordmark. |
+| `components/layout/DisclosureBar.tsx` | Persistent, non-dismissable retailer disclosure. |
+| `components/layout/Header.tsx` | Sticky header, anchor nav, solid phone-number button, mobile sheet. |
+| `components/layout/Footer.tsx` | Dark 4-column footer modelled on bestfiberinternet.us. |
+| `components/layout/LegalPage.tsx` | Shared shell for the four legal routes. |
+| `components/sections/Hero.tsx` | Hero + ZIP checker + call button + trust chips + trust marquee. |
+| `components/sections/FiberField.tsx` | Canvas "black hole" spiral data field. |
+| `components/sections/PlanCard.tsx` | 3D tilt plan card. |
+| `components/sections/ServiceLineSection.tsx` | Renders service lines in canonical order; omits lines with no plans. |
+| `components/sections/Features.tsx` | Staggered benefits grid. |
+| `components/sections/FinePrint.tsx` | Comparison table (desktop) + stacked cards (mobile). |
+| `components/sections/HowItWorks.tsx` | Scroll-scrubbed gateway assembly animation. |
+| `components/sections/Faq.tsx` | Accordion. |
+
+#### App routes
+| File | Purpose |
+|---|---|
+| `app/layout.tsx` | Metadata, Inter font, JSON-LD (Organization + Product per plan + FAQPage), global chrome, `.anim` bootstrap script. |
+| `app/page.tsx` | Canonical section order. |
+| `app/globals.css` | Design tokens, button/chip components, all animation CSS, reduced-motion overrides. |
+| `app/privacy/`, `app/terms/`, `app/accessibility/`, `app/do-not-sell/` | Legal routes. |
+| `app/icon.svg`, `app/sitemap.ts`, `app/robots.ts` | Favicon, sitemap, robots. |
+
+### Page order as built
+```
+Top disclosure bar  →  Sticky header  →  Hero  →  Fiber plans  →  Why fiber
+  →  Honest fine print  →  How it works  →  FAQ  →  Footer
+```
+
+### Service-line audit against fidiumfiber.com
+| Line | Offered? | Result |
+|---|---|---|
+| Fiber | Yes | 5 plans rendered |
+| Cable | No | Section omitted entirely |
+| Bundles | No | Section omitted entirely |
+| TV | No | Section omitted entirely |
+| Mobile | No | Section omitted entirely |
+| Phone / VoIP | No | Section omitted entirely |
+
+Fidium is a fiber-only ISP. Empty service lines resolve to zero plans, so
+`ACTIVE_SERVICE_SECTIONS` filters them out and no placeholder is ever rendered.
+
+### Plan data (verified against the official Fidium price-card data)
+| Plan | Speed | Price | Notes |
+|---|---|---|---|
+| Light use | 300 Mbps | $30/mo | BYO router supported |
+| Busy homes | 1 Gig | $50/mo | + 1 month free |
+| Power users | 2 Gig | $60/mo | **Best value** · + 1 month free |
+| Creators & pros | 5 Gig | $80/mo | WiFi 7 · + 1 month free |
+| Future ready | 8 Gig | $130/mo | WiFi 7 · + 1 month free |
+
+All symmetrical. Unlimited data, no contracts, free professional installation.
+
+### Brand colors (sampled from the live fidiumfiber.com stylesheet)
+`#93D500` lime · `#00AE42` green · `#008533` deep green · `#003595` navy ·
+`#F97E19` promo orange · `#0B1220` ink
+
+### Animations implemented
+Scroll-scrubbed gateway assembly · Lenis smooth scroll · canvas black-hole fiber
+field · word-by-word text reveals · parallax hero · SVG path draw · magnetic
+buttons · clip-path section wipes · 3D card tilt · staggered grid entrances ·
+infinite marquee.
+
+All are custom-built on IntersectionObserver, rAF and CSS — **no animation
+library** — which is why First Load JS stays at 101 kB. Every one of them is
+disabled under `prefers-reduced-motion: reduce`.
+
+### Negative constraints — all honoured
+- No support-routing copy anywhere.
+- Hero keeps **both** the ZIP checker and a call button.
+- Every CTA outside the header/footer reads "Call to order" (or "Call for
+  pricing" automatically if a plan has no price).
+- No competitor bashing or "ordering channel" phrasing.
+- No cable/TV/mobile/bundle/phone sections and no placeholder cards.
+- No Broadband Facts label link.
+- No "Pricing observed [date]" or any date stamp.
+- No "Is this the official Fidium site?" FAQ.
+
+### Fixes applied during verification (all in the delivered build)
+
+| Fix | File | Why |
+|---|---|---|
+| Gradient headline words | `Reveal.tsx`, `globals.css` | `background-clip: text` on a parent repaints wrongly once a child is transformed, smearing the words together. Each word now carries its own gradient, stretched to the line width and offset per word, so the ramp stays continuous. |
+| No-JS safety net | `layout.tsx`, `globals.css` | Entrance animations start at `opacity: 0`. They are now armed only by an `.anim` class that JavaScript sets before first paint, so a failed script can never leave the page blank. |
+| Canvas trail maths | `FiberField.tsx` | Trail vectors were computed against the centre instead of the particle's own previous position, drawing long diagonal streaks instead of a spiral. |
+| Mobile fine-print rows | `FinePrint.tsx` | A long value (e.g. "WiFi 7 gateway and extenders included") squeezed the row label to zero width. The row now wraps the value onto its own line instead. |
+| Header at 320px | `Logo.tsx`, `Header.tsx` | Logo + call + menu overflowed the row by 10px. The logo's "Authorized Retailer" line is hidden below `sm` (`compact` prop) — the disclosure bar above already states it. |
+| ZIP success state | `Hero.tsx` | Replaced an inline phone-number link with a proper "Call to order" button, keeping every CTA on-label and improving conversion. |
+
+### Verification performed
+
+- `tsc --noEmit` clean; production build clean.
+- **Pricing is genuinely centralised:** temporarily changing one plan's price and
+  speed in `lib/content.ts` updated 14 rendered price locations and 22 speed
+  locations across hero, cards, table, FAQ and footer, with zero stale values.
+  Reverted afterwards.
+- `grep` confirms **no** hardcoded price, speed or CTA label exists in any
+  `.tsx` file.
+- **Zero horizontal overflow at 320px** — `document.scrollWidth` is exactly 320.
+- All 24 `tel:` links carry `data-call-cta`.
+- Only CTA label outside the header/footer is "Call to order".
+- Banned-phrase sweep across all 6 built routes: clean.
+- Omitted service lines (cable, bundle, TV, mobile, phone) render nothing at all.
+
+---
+
+## Placeholders to replace before launch
+
+These are in `lib/content.ts`, at the top, in the `SITE` object:
+
+| Field | Current value | Action |
+|---|---|---|
+| `entity` | `Fiberline Communications LLC` | Your registered legal entity |
+| `shortName` | `Fiberline` | Short form used in prose |
+| `phoneDisplay` / `phoneHref` | `(888) 425-0568` | Your call-tracking number (**both** fields) |
+| `address` | `1 Commerce Way, Suite 200, Manchester, NH 03101` | Your registered business address |
+| `domain` | `fidium-authorized-retailer.com` | Your production domain |
+
+Nothing else in the codebase hardcodes any of these.
+
+---
+
+## How to make common changes
+
+**Change a price** — `lib/content.ts` → the plan's `price` field.
+Propagates to the hero lockup, plan card, comparison table (desktop and
+mobile), JSON-LD offers and the footer. Verified: changing one price updated
+14 rendered locations with zero stale values left behind.
+
+**Change a speed** — the plan's `speedDown` / `speedUp`. `formatSpeed()` turns
+`300` into "300 Mbps" and `2000` into "2 Gig" everywhere, including FAQ answers.
+
+**Add or remove a plan** — add or delete an entry in the `PLANS` array. Grids,
+the table's column count and the footer plan list all follow automatically.
+
+**Add a service line Fidium starts selling** — add plans with that
+`serviceLine`. The matching section in `SERVICE_SECTIONS` starts rendering by
+itself, in canonical order. Remove the plans and it disappears again.
+
+**A plan with no public price** — omit the `price` field. The lockup switches to
+"Call for pricing" and so does that card's CTA button, automatically.
+
+**Change the promotion** — `promoHeadline` and `promoQualifier` per plan, plus
+`FINE_PRINT.footnote` for the table footnote.
+
+**Change CTA wording** — the `CTA` object. One edit changes every button.
+
+**Edit the FAQ** — the `FAQ` array. Drives both the accordion and the FAQPage
+structured data.
+
+---
+
+## Commands
+
+```bash
+npm run dev        # http://localhost:3000
+npm run build      # production build
+npm run start      # serve the production build
+npm run typecheck  # tsc --noEmit
+```
+
+---
+
+## How to revert
+
+The project has no git history yet. To make future reverts easy:
+
+```bash
+git init && git add -A && git commit -m "Initial Fidium retailer site"
+```
+
+Until then, this entry documents the full file list above — deleting those
+paths returns the directory to empty.
