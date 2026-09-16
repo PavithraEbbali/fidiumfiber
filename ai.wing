@@ -5,6 +5,46 @@ Each entry lists what changed, why, and how to undo it.
 
 ---
 
+## [0008] 2026-09-16 — Hero call button and OR divider removed
+
+Removed from the hero, on request:
+
+- the `OR` divider rule
+- the dark **"Call to order"** button
+
+Kept: the ZIP checker, its "Availability varies by address." helper line, the
+price lockup and the trust chips.
+
+> **This reverses the original hero rule.** The initial brief said the hero must
+> contain *both* a ZIP checker and a call button. It now has only the ZIP
+> checker. Confirmed as intentional before making the change.
+>
+> The hero is not completely without a call path: submitting a valid ZIP still
+> reveals a "Call to order" button in the success state (`data-call-source="zip-result"`),
+> and the header phone button sits directly above the hero.
+
+Hero height dropped from 1005px to **911px** desktop, 866px at 375px wide.
+
+`CallButton` and `HERO_PLAN` imports are still required in `Hero.tsx` — the ZIP
+success state and the price lockup both use them — so nothing became unused.
+
+### Verified
+
+- OR divider and the hero call button absent from the built HTML.
+- ZIP input, helper line and all 3 trust chips still present.
+- 23 `tel:` links site-wide, all carrying `data-call-cta`.
+- CTA labels unchanged: "Call to order", "Call for pricing", and the
+  header/footer number.
+- No horizontal overflow at 375px or desktop.
+
+### To revert this entry
+
+Restore the divider and `<CallButton plan={HERO_PLAN} variant="dark"
+source="hero" fullWidth />` inside the ZIP block in `Hero.tsx`, and change the
+wrapper back to `flex flex-col gap-3.5`.
+
+---
+
 ## [0007] 2026-09-16 — Mobile responsiveness, Vercel prep, first push
 
 ### Responsive: the two background photographs needed a per-breakpoint strategy

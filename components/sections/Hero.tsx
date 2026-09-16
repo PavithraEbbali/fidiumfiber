@@ -239,23 +239,8 @@ export function Hero({ hasHeroImage = false }: { hasHeroImage?: boolean }) {
 
           {/* --------------------------------- zip + call, side by side */}
           <Reveal delay={340} y={18} className="w-full">
-            <div className="mx-auto mt-6 flex w-full max-w-[34rem] flex-col gap-3.5 sm:mt-8">
+            <div className="mx-auto mt-6 w-full max-w-[34rem] sm:mt-8">
               <ZipChecker />
-
-              <div className="flex items-center gap-3">
-                <span aria-hidden="true" className="h-px flex-1 bg-slate-200" />
-                <span className="rounded-full bg-white/90 px-2 py-0.5 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-slate-600">
-                  or
-                </span>
-                <span aria-hidden="true" className="h-px flex-1 bg-slate-200" />
-              </div>
-
-              <CallButton
-                plan={HERO_PLAN}
-                variant="dark"
-                source="hero"
-                fullWidth
-              />
             </div>
           </Reveal>
 
